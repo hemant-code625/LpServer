@@ -1,4 +1,3 @@
-// const express = require('express');
 import express from 'express';
 import mongoose from 'mongoose';
 import session from 'express-session';
@@ -7,7 +6,7 @@ import dotenv from 'dotenv';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import {RequestRouter} from './routes/request.js';
-
+import User from './modules/user.js';
 
 dotenv.config();
 
@@ -19,14 +18,6 @@ async function main(){
 main().catch(err=> console.log(err));
 
 
-//creating a schema for user login
-const userSchema = new mongoose.Schema({
-    name: {type: String, require: true},
-    googleId: {type: String, require: true, unique: true},
-    picture: {type: String, require: true,},
-    email: {type: String, require: true, unique: true}
-})
-const User = mongoose.model('User', userSchema);
 
 const app = express();
 
