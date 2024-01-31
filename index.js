@@ -113,7 +113,9 @@ app.get('/getUser', (req, res) => {
     res.json({ user: null });
   }
 });
-
+app.get('/', (req, res) => {
+  res.send('Hello from server!');
+})
 
 app.use('/zone', RequestRouter)
 
