@@ -1,3 +1,4 @@
+import { request } from "express";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -5,6 +6,27 @@ const userSchema = new mongoose.Schema({
   googleId: { type: String, require: true, unique: true },
   picture: { type: String, require: true },
   email: { type: String, require: true, unique: true },
+  requests: [{ 
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        required: true
+      },
+      coordinates: {
+        type: [Number],
+        required: true
+      }
+    },
+    timestamp: {
+      type: Date,
+      required: true
+    },
+    status: {
+      type: String,
+      required: true
+    }
+   }],
 });
 
 const User = mongoose.model("User", userSchema);
