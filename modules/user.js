@@ -1,4 +1,3 @@
-import { request } from "express";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -17,6 +16,13 @@ const userSchema = new mongoose.Schema({
         type: [Number],
         required: true
       }
+    },
+    requestTitle: {
+      type: String,
+      required: true
+    },
+    requestDescription: {
+      type: String
     },
     timestamp: {
       type: Date,
