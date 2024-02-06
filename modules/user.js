@@ -35,5 +35,9 @@ const userSchema = new mongoose.Schema({
    }],
 });
 
+
+// Define the geospatial index for requests
+userSchema.index({ 'requests.location.coordinates': '2dsphere' });
+
 const User = mongoose.model("User", userSchema);
 export default User;

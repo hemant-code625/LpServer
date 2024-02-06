@@ -75,6 +75,13 @@ passport.use(new GoogleStrategy({
       try {
         const user = await User.findOne({ googleId: profile.id });
         if (user) {
+          // const modifiedUser = {
+          //   name: user.name,
+          //   picture: user.picture,
+          //   email: user.email,
+          //   googleId: user.googleId,
+
+          // };
           return done(null, user);
         } else {
           // Create a new user in the database if not found

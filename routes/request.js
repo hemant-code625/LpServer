@@ -5,58 +5,26 @@ import User from '../modules/user.js';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    try {
-      // API -1
-      // const { latitude, longitude, maxDistance = 100, maxTimeDifference = 15 } = req.body;
-      // const requests = await User.aggregate([
-      //   {
-      //     $geoNear: {
-      //       near: {
-      //         type: 'Point',
-      //         coordinates: [parseFloat(longitude), parseFloat(latitude)]
-      //       },
-      //       distanceField: 'distance',
-      //       maxDistance: maxDistance,
-      //       spherical: true
-      //     }
-      //   },
-      //   {
-      //     $unwind: '$requests'
-      //   },
-      //   {
-      //     $match: {
-      //       'requests.status': 'active',
-      //       'requests.timestamp': {
-      //         $gt: new Date(Date.now() - maxTimeDifference * 60 * 1000)
-      //       }
-      //     }
-      //   },
-      //   {
-      //     $group: {
-      //       _id: '$_id',
-      //       requests: { $push: '$requests' }
-      //     }
-      //   }
-      // ]);
+  try {
+    const { latitude, longitude, proximity } = req.query;
+    const userRequests = await User.find({
+      'requests.location.coordinates': {
+        $nearSphere: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+          },
+          $maxDistance: parseFloat(proximity) * 1000, // Convert proximity to meters
+        },
+      },
+    });
+
+    res.json(userRequests);
+    
+      // const users = await User.find({});  // to get requests from all users
+      // const requests = users.map(user => user.requests.filter(request => request.status === 'active'));
       // console.log("Requests array from db ", requests);
-      // res.send(requests[0]?.requests || []);
-
-      // API -2 
-      // const query = {
-      //   location: {
-      //     $geoWithin: {
-      //      $centerSphere: [[parseFloat(longitude), parseFloat(latitude)], maxDistance / 3963.2 ]    // range of maxDistance in miles
-      //     }
-      //   },
-      //   timestamp: {
-      //     $gt: new Date(Date.now() - maxTimeDifference * 60 * 1000) // Calculate 15 minutes ago
-      //   }
-      // };
-
-      const users = await User.find({});  // to get requests from all users
-      const requests = users.map(user => user.requests.filter(request => request.status === 'active'));
-      console.log("Requests array from db ", requests);
-      res.json(requests);
+      // res.json(requests);
 
     } catch (error) {
       console.error(error);
