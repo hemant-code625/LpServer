@@ -1,6 +1,8 @@
 import express, { request } from 'express';
 // import Request from '../modules/request.js';
 import User from '../modules/user.js';
+import { io } from '../socket.js';
+
 const router = express.Router();
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -25,19 +27,22 @@ router.get('/', async (req, res) => {
       var acceptedRequests = [];
       const users = await User.find({});
       const requests = users.map(user => user.requests.filter(request => request.status === 'active' ));
-      requests[0].forEach(element => {
-         if(element.location){
-          reqLat = element.location.coordinates[1];
-          reqLong = element.location.coordinates[0];
-          distance = calculateDistance(latitude, longitude, reqLat, reqLong);
-          console.log("distance of ",element.requestTitle," is ",distance);
-          if(distance <= proximity){
-            acceptedRequests.push(element);
-          }
-         }else{
-            console.log("No location found");
+      requests.map((request) => request.forEach(element => {
+        if(element.location){
+         reqLat = element.location.coordinates[1];
+         reqLong = element.location.coordinates[0];
+         distance = calculateDistance(latitude, longitude, reqLat, reqLong);
+         console.log("distance of ",element.requestTitle," is ",distance);
+         if(distance <= proximity){
+           acceptedRequests.push(element);
          }
-      });
+        }else{
+           console.log("No location found");
+        }
+     }));
+      // SOCKET WILL SEND THIS REQ TO ALL THE USERS
+      io.emit("getRequests", acceptedRequests);     
+
       res.json(acceptedRequests);
     } catch (error) {
       console.error(error);
@@ -61,6 +66,11 @@ router.put('/', async (req, res) => {
         status: 'active'
       });
       const result = await existingUser.save();
+
+      // ADD SOCKET FUNCTIONALITY HERE
+      console.log("New request added",result.requests[result.requests.length-1]);
+      io.emit("newRequest", result.requests[result.requests.length-1]);
+
       res.json(result);
     }else{
       res.status(404).json({ error: 'User not found' });

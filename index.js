@@ -7,6 +7,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import {RequestRouter} from './routes/request.js';
 import User from './modules/user.js';
+import {server, app} from './socket.js';
 
 dotenv.config();
 
@@ -16,8 +17,6 @@ async function main(){
     console.log('database connected')
 }
 main().catch(err=> console.log(err));
-
-const app = express();
 
 
 // Passport middleware configuration
@@ -128,6 +127,6 @@ app.get('/check',(req,res)=>{
   res.send({user: req.user});
 })
 
-app.listen(8080, () => {
+server.listen(8080, () => {
   console.log('Server listening on port 8080');
 });
