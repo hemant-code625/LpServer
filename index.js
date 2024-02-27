@@ -53,7 +53,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: 'http://localhost:5173',  // Replace with the origin of your React app
+  origin: `${process.env.CLIENT_URL}`,  // Replace with the origin of your React app
   credentials: true,
 };
 
@@ -64,7 +64,7 @@ app.use(cors(corsOptions));
 passport.use(new GoogleStrategy({
     clientID: `${process.env.GOOGLE_CLIENT_ID}`,
     clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`,
-    callbackURL: 'http://localhost:8080/auth/google/callback',
+    callbackURL: `${process.env.GOOGLE_CALLBACK_URL}`,
     scope: [ 'profile' ],
     state: true
   },
@@ -103,7 +103,7 @@ passport.use(new GoogleStrategy({
 // Authentication routes
 app.get('/auth/google', passport.authenticate('google',{ scope: [ 'email', 'profile' ] }) );
 app.get('/auth/google/callback', passport.authenticate('google',{
-  successRedirect: 'http://localhost:5173',
+  successRedirect: `${process.env.CLIENT_URL}`,
   failureRedirect: '/'
 }));
 
