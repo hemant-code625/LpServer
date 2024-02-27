@@ -104,11 +104,12 @@ passport.use(new GoogleStrategy({
 app.get('/auth/google', passport.authenticate('google',{ scope: [ 'email', 'profile' ] }) );
 app.get('/auth/google/callback', passport.authenticate('google',{
   successRedirect: `${process.env.CLIENT_URL}`,
-  failureRedirect: '/'
+  failureRedirect: '/failedLogin'
 }));
 
-
-
+app.get('/failedLogin', (req, res) => {
+  res.status(401).send('Login failed. Please try again.'); 
+});
 // sending user after login
 app.get('/getUser', (req, res) => {
   if (req.user) {
