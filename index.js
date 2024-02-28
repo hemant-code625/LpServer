@@ -19,15 +19,15 @@ async function main(){
 main().catch(err=> console.log(err));
 
 
-// Passport middleware configuration
+// Session middleware configuration
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
   }
-}))
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -36,15 +36,14 @@ passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser( async (id, done) => {
-  const res = await User.findById(id);
-  if(res){
-      done(null, res);
-  }else{
-      done(null, false);
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
   }
-  
-})   
+});   
 
 app.use(passport.authenticate('session'));
 
@@ -103,10 +102,17 @@ passport.use(new GoogleStrategy({
 // Authentication routes
 app.get('/auth/google', passport.authenticate('google',{ scope: [ 'email', 'profile' ] }) );
 app.get('/auth/google/callback', passport.authenticate('google',{
-  successRedirect: `${process.env.CLIENT_URL}`,
-  failureRedirect: '/failedLogin'
+  successRedirect: `${process.env.CLIENT_URL}/zone`,
+  failureRedirect:`${process.env.CLIENT_URL}/failedLogin`
 }));
 
+app.get('/profile', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.send('You are logged in as ' + req.user.name);
+  } else {
+    res.redirect('/failedLogin');
+  }
+});
 app.get('/failedLogin', (req, res) => {
   res.status(401).send('Login failed. Please try again.'); 
 });
