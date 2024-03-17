@@ -6,8 +6,9 @@ import dotenv from 'dotenv';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import {RequestRouter} from './routes/request.js';
-import User from './modules/user.js';
+import User from './models/user.js';
 import {server, app} from './socket.js';
+import MessageRouter from './routes/messages.js';
 
 dotenv.config();
 
@@ -129,7 +130,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/zone', RequestRouter)
-
+app.use('/chat', MessageRouter)
 app.get('/check',(req,res)=>{
   res.send({user: req.user});
 })

@@ -6,6 +6,12 @@ const userSchema = new mongoose.Schema({
   picture: { type: String, require: true },
   email: { type: String, require: true, unique: true },
   requests: [{ 
+    user:{
+      id: { type: String, require: true },
+      name: { type: String, require: true },
+      picture: { type: String, require: true },
+      email: { type: String, require: true },
+    },
     location: {
       type: {
         type: String,

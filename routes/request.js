@@ -1,6 +1,6 @@
 import express, { request } from 'express';
 // import Request from '../modules/request.js';
-import User from '../modules/user.js';
+import User from '../models/user.js';
 import { io } from '../socket.js';
 
 const router = express.Router();
@@ -32,7 +32,6 @@ router.get('/', async (req, res) => {
          reqLat = element.location.coordinates[1];
          reqLong = element.location.coordinates[0];
          distance = calculateDistance(latitude, longitude, reqLat, reqLong);
-         console.log("distance of ",element.requestTitle," is ",distance);
          if(distance <= proximity){
            acceptedRequests.push(element);
          }
@@ -56,6 +55,12 @@ router.put('/', async (req, res) => {
     const existingUser = await User.findOne( { googleId: user.googleId});
     if(existingUser){
       existingUser.requests.push({
+        user: {
+          id: user._id,
+          name: user.name,
+          picture: user.picture,
+          email: user.email
+        },
         location: {
           type: "Point",
           coordinates: [parseFloat(longitude), parseFloat(latitude)]
