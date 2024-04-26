@@ -9,6 +9,7 @@ import {RequestRouter} from './routes/request.js';
 import User from './models/user.js';
 import {server, app} from './socket.js';
 import MessageRouter from './routes/messages.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
   }
 }));
-
+app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -72,13 +73,6 @@ passport.use(new GoogleStrategy({
       try {
         const user = await User.findOne({ googleId: profile.id });
         if (user) {
-          // const modifiedUser = {
-          //   name: user.name,
-          //   picture: user.picture,
-          //   email: user.email,
-          //   googleId: user.googleId,
-
-          // };
           return done(null, user);
         } else {
           // Create a new user in the database if not found
@@ -117,14 +111,19 @@ app.get('/profile', (req, res) => {
 app.get('/failedLogin', (req, res) => {
   res.status(401).send('Login failed. Please try again.'); 
 });
-// sending user after login
+
+
 app.get('/getUser', (req, res) => {
-  if (req.user) {
-    res.json({user : req.user });
+  // Check if user is authenticated
+  if (req.isAuthenticated()) {
+      // If authenticated, send user data
+      res.json({ user: req.user });
   } else {
-    res.json({ user: null });
+      // If not authenticated, send null
+      res.json({ user: null });
   }
 });
+
 app.get('/', (req, res) => {
   res.send('Hello from server!');
 })

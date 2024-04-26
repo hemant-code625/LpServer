@@ -5,9 +5,14 @@ import { getReceiverSocketId } from "../socket.js";
 import { io } from "../socket.js";
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+
+router.get("/:id", async (req, res) => {                  // here also the id is of userToChat (receiverId) 
 	try {
-		const { yourId: senderId, friendId: userToChatId } = req.body;
+		const { id: userToChatId } = req.params;
+		// const user = await getUser();
+		const senderId = req.user;
+		console.log("senderId", senderId);
+		// const senderId = "65f67e5691c87421cd8dbed6"
 
 		const conversation = await Conversation.findOne({
 			participants: { $all: [senderId, userToChatId] },
@@ -23,10 +28,12 @@ router.get("/", async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}});
 
-router.post("/", async (req, res) => {
+	
+router.post("/send/:id", async (req, res) => {                     // recieverId in params
 	try {
-		const { message , yourId: senderId, friendId: receiverId } = req.body;
-
+		const { message } = req.body;
+		const { id: receiverId } = req.params;
+		const senderId = req.user.data._id;
 		let conversation = await Conversation.findOne({
 			participants: { $all: [senderId, receiverId] },
 		});
